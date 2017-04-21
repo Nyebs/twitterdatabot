@@ -32,9 +32,9 @@ logging.basicConfig(level=logging.INFO)
 global i
 i = 0
 
-#chatbot = ChatBot("lain", storage_adapter="chatterbot.storage.JsonFileStorageAdapter", logic_adapters=["chatterbot.logic.MathematicalEvaluation", "chatterbot.logic.TimeLogicAdapter", "chatterbot.logic.BestMatch"],input_adapter="chatterbot.input.VariableInputTypeAdapter",output_adapter="chatterbot.output.TerminalAdapter",trainer="chatterbot.trainers.TwitterTrainer",database="../database.db")
-#print("chatbot created...")
-#chatbot.train()
+chatbot = ChatBot("lain", storage_adapter="chatterbot.storage.JsonFileStorageAdapter", logic_adapters=["chatterbot.logic.MathematicalEvaluation", "chatterbot.logic.TimeLogicAdapter", "chatterbot.logic.BestMatch"],input_adapter="chatterbot.input.VariableInputTypeAdapter",output_adapter="chatterbot.output.TerminalAdapter",trainer="chatterbot.trainers.TwitterTrainer",database="../database.db")
+print("chatbot created...")
+chatbot.train()
 
 print("chatbot trained...")
 
@@ -133,9 +133,10 @@ def urlGetter():
     sentiments = []
     for preKey in title:
         key = preKey.replace("/", " ")
- #       print("you: what did you think about " + key)
- #       thoughts = chatbot.get_response("what did you think about " + key)
+        print("you: what did you think about " + key)
+        thoughts = chatbot.get_response("what did you think about " + key)
         getSentiment(api, key)
+        api.update_status(thoughts + " | " + key + avgSentiment)
     print("got the url...")
 
 def longformChooser():
