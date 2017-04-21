@@ -12,6 +12,7 @@ import progressbar
 import numpy as np
 from sklearn.svm import SVR
 from chatterbot import ChatBot
+import logging
 
 consumer_key = 'KYhDmj2YaforxBbuK9RfqmBIb'
 consumer_secret = 'PqtjyTdMI0PVhj31yBfLMPlJoBHX1sRQ5H5KjoKGeZoZ8WXdFE'
@@ -22,17 +23,20 @@ auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 
 api = tweepy.API(auth)
-
+print("logged in to twitter...")
 #global verbose
 #verbose = input("verbose? (y/n): \n> ")
+
+logging.basicConfig(level=logging.INFO)
 
 global i
 i = 0
 
-chatbot = ChatBot("lain", trainer="chatterbot.trainers.ChatterBotCorpusTrainer")
-chatbot.train("chatterbot.corpus.english")
-chatbot.train("chatterbot.corpus.english.greetings")
-chatbot.train("chatterbot.corpus.english.conversations")
+#chatbot = ChatBot("lain", storage_adapter="chatterbot.storage.JsonFileStorageAdapter", logic_adapters=["chatterbot.logic.MathematicalEvaluation", "chatterbot.logic.TimeLogicAdapter", "chatterbot.logic.BestMatch"],input_adapter="chatterbot.input.VariableInputTypeAdapter",output_adapter="chatterbot.output.TerminalAdapter",trainer="chatterbot.trainers.TwitterTrainer",database="../database.db")
+#print("chatbot created...")
+#chatbot.train()
+
+print("chatbot trained...")
 
 def folderMaker():
     theDate = time.strftime("%d_%m_%Y")
@@ -47,6 +51,8 @@ def folderMaker():
             os.chdir("custom")
         else:
             os.chdir("custom")
+    print("made the folder...")
+
 def getSentiment(api, key):
     public_tweets = api.search(key, count = 100, lang = "en")
     noOfTweets = len(public_tweets)
@@ -127,13 +133,15 @@ def urlGetter():
     sentiments = []
     for preKey in title:
         key = preKey.replace("/", " ")
-        thoughts = chatbot.get_response("what do you think about " + key)
-        print(thoughts)
+ #       print("you: what did you think about " + key)
+ #       thoughts = chatbot.get_response("what did you think about " + key)
         getSentiment(api, key)
+    print("got the url...")
 
 def longformChooser():
     global longform
-    longform = input("rerun every 15 minutes? [y/n]\n ")
+    longform = input("rerun every 15 minutes? [y/n]\n> ")
+    print("option choosen...")
 
 def longformsRevenge():
     if longform == "y":
@@ -185,3 +193,4 @@ elif function == "2":
     folderMaker()
     urlGetter()
     longformsRevenge
+print("got the sentiment...")
