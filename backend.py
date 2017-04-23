@@ -27,19 +27,23 @@ print("logged in to twitter...")
 #global verbose
 #verbose = input("verbose? (y/n): \n> ")
 
-logging.basicConfig(level=logging.INFO)
+#logging.basicConfig(level=logging.INFO)
 
 global i
 i = 0
 
-chatbot = ChatBot("lain", storage_adapter="chatterbot.storage.JsonFileStorageAdapter", logic_adapters=["chatterbot.logic.MathematicalEvaluation", "chatterbot.logic.TimeLogicAdapter", "chatterbot.logic.BestMatch"],input_adapter="chatterbot.input.VariableInputTypeAdapter",output_adapter="chatterbot.output.TerminalAdapter",trainer="chatterbot.trainers.TwitterTrainer",database="../database.db")
-print("chatbot created...")
-chatbot.train()
+#chatbot = ChatBot("lain", storage_adapter="chatterbot.storage.JsonFileStorageAdapter", logic_adapters=["chatterbot.logic.MathematicalEvaluation", "chatterbot.logic.TimeLogicAdapter", "chatterbot.logic.BestMatch"],input_adapter="chatterbot.input.VariableInputTypeAdapter",output_adapter="chatterbot.output.TerminalAdapter",trainer="chatterbot.trainers.ChatterBotCorpusTrainer",database="../database.db")
+#chatbot.train("./data/tweet.csv")
 
-print("chatbot trained...")
+#print("chatbot trained...")
 
 def folderMaker():
     theDate = time.strftime("%d_%m_%Y")
+    if not os.path.exists("data"):
+        os.makedirs("data")
+        os.chdir("data")
+    else:
+        os.chdir("data")
     if not os.path.exists(theDate):
         os.makedirs(theDate)
         os.chdir(theDate)
@@ -87,19 +91,21 @@ def getSentiment(api, key):
             global avgSentiment
             avgSentiment = totalSentiment / noOfTweets
 #            if verbose == "y":
-#            print("> @" + author + ":", text, " | ", analysis.sentiment)
-#            print("\n")
+            print("> @" + author + ":", text, " | ", analysis.sentiment)
+            print("\n")
             row_to_add = str(index) + ',' + "@" + author + ',' + text + ','
             if theSentiment > 0:
-                file.write(row_to_add + 'Positive' + ',' + str(theSentiment) + ',' + str(nouns))
+                file.write(row_to_add + 'positive' + ',' + str(theSentiment) + ',' + str(nouns))
                 file.write('\n')
             elif theSentiment == 0:
-                file.write(row_to_add + 'Neutral' + ',' + str(theSentiment) + ',' + str(nouns))
+                file.write(row_to_add + 'neutral' + ',' + str(theSentiment) + ',' + str(nouns))
                 file.write('\n')
             else:
-                file.write(row_to_add + 'Negative' + ',' + str(theSentiment) + ',' + str(nouns))
+                file.write(row_to_add + 'negative' + ',' + str(theSentiment) + ',' + str(nouns))
                 file.write('\n')
-
+    with open ('./tweet.csv', 'w') as corpus:
+        corpusToAdd = "[" + "'" + str(key) + "'" + "," + "'" + str(text) + "'" + "]" + ","
+        corpus.write(corpusToAdd)
 #    def addMoreEntries():
 #        moreEntries = input("more terms? (y/n): \n> ")
 #        if moreEntries == "y":
@@ -133,11 +139,11 @@ def urlGetter():
     sentiments = []
     for preKey in title:
         key = preKey.replace("/", " ")
-        print("you: what did you think about " + key)
-        thoughts = chatbot.get_response("what did you think about " + key)
+#        print("you: what did you think about " + key)
+#        thoughts = chatbot.get_response("what did you think about " + key)
         getSentiment(api, key)
-        api.update_status(thoughts + " | " + key + avgSentiment)
-    print("got the url...")
+#        api.update_status(thoughts + " | " + key + " | " + str(avgSentiment))
+        print("got the url...")
 
 def longformChooser():
     global longform
